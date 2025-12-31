@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="內控稽查">
+    
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/7604/7604036.png"> 
+
     <title>加油站業務稽查系統 (手機版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -21,7 +27,11 @@
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", sans-serif;
             margin: 0; padding: 0; background: var(--bg-color); color: var(--text-main);
-            padding-bottom: 90px; -webkit-tap-highlight-color: transparent;
+            /* 下方留白給導航列 */
+            padding-bottom: 90px; 
+            /* 上方留白給 iPhone 瀏海/動態島 (關鍵修正) */
+            padding-top: env(safe-area-inset-top);
+            -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
         }
 
@@ -33,7 +43,9 @@
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             border-top: 1px solid rgba(0,0,0,0.1);
             display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
+            /* 底部也要避開 Home Bar (那條橫線) */
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 1000;
         }
         .nav-item {
             flex: 1; text-align: center; color: #999; font-size: 11px;
@@ -158,6 +170,8 @@
         #fillPanel {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #F2F2F7; z-index: 3000; display: none; flex-direction: column;
+            /* 面板也要避開瀏海 */
+            padding-top: env(safe-area-inset-top);
         }
         #fillHeader {
             padding: 15px; background: white; border-bottom: 1px solid #ddd;
@@ -192,7 +206,7 @@
 </head>
 <body>
 
-<div id="toast" style="position:fixed; top:40px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.9); color:white; padding:12px 24px; border-radius:30px; font-size:16px; font-weight:bold; opacity:0; pointer-events:none; transition:0.3s; z-index:3000; box-shadow:0 4px 15px rgba(0,0,0,0.3);"></div>
+<div id="toast" style="position:fixed; top:60px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.9); color:white; padding:12px 24px; border-radius:30px; font-size:16px; font-weight:bold; opacity:0; pointer-events:none; transition:0.3s; z-index:3000; box-shadow:0 4px 15px rgba(0,0,0,0.3);"></div>
 
 <div id="fillPanel">
     <div id="fillHeader">
