@@ -3,12 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="內控稽查">
-    
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/7604/7604036.png"> 
-
     <title>加油站業務稽查系統 (手機版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -27,12 +21,9 @@
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", sans-serif;
             margin: 0; padding: 0; background: var(--bg-color); color: var(--text-main);
-            /* 下方留白給導航列 */
-            padding-bottom: 90px; 
-            /* 上方留白給 iPhone 瀏海/動態島 (關鍵修正) */
-            padding-top: env(safe-area-inset-top);
-            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 90px; -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
         }
 
         #app-root { display: block; width: 100%; min-height: 100vh; }
@@ -43,9 +34,7 @@
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             border-top: 1px solid rgba(0,0,0,0.1);
             display: flex; justify-content: space-around; align-items: center;
-            /* 底部也要避開 Home Bar (那條橫線) */
-            padding-bottom: env(safe-area-inset-bottom);
-            z-index: 1000;
+            z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
         }
         .nav-item {
             flex: 1; text-align: center; color: #999; font-size: 11px;
@@ -91,22 +80,15 @@
             background: #E6F2FF; color: var(--primary); font-weight: bold;
         }
         
-        /* v20 修正：確保 item-title 就算空白也有高度可點擊，並加上 placeholder */
         .item-title { 
             font-size: 17px; font-weight: bold; color: #000; line-height: 1.5; 
             margin-bottom: 10px; word-wrap: break-word; 
-            white-space: pre-wrap; min-height: 1.5em; /* 增加最小高度 */
-            border-bottom: 1px dashed transparent; /* 視覺提示 */
+            white-space: pre-wrap; min-height: 1.5em; 
+            border-bottom: 1px dashed transparent; 
         }
         .item-title:focus { border-bottom: 1px dashed #ccc; outline: none; }
         .item-title:empty::before { content: attr(placeholder); color: #bbb; pointer-events: none; }
 
-        .item-title-sub { 
-            display: block; margin-top: 6px; font-size: 15px; color: #0056b3; 
-            background: #f0f8ff; padding: 8px; border-radius: 6px; border-left: 3px solid #007AFF;
-            line-height: 1.5;
-        }
-        
         .btn-icon { background: none; border: none; font-size: 22px; padding: 4px; cursor: pointer; float: right;}
         
         .edit-body {
@@ -117,14 +99,34 @@
         }
         .edit-body:focus { background: #fff; border-color: var(--primary); }
         
-        /* 黃色互動框 */
+        /* --- 黃色互動框 (自由輸入版) --- */
         .fill-spot {
-            background-color: #FFF9DB; border-bottom: 1px dashed #999;
-            border-radius: 4px; padding: 2px 6px; margin: 0 2px;
-            display: inline-block; color: #333; min-width: 60px;
-            text-align: center; font-weight: bold; cursor: pointer;
+            background-color: #FFF9DB; 
+            border-bottom: 1px dashed #999;
+            border-radius: 4px; 
+            padding: 2px 6px; 
+            margin: 0 2px;
+            display: inline-block; 
+            color: #333; 
+            min-width: 60px;
+            text-align: center; 
+            font-weight: bold; 
+            cursor: text; /* 改為游標 */
+            transition: all 0.2s;
         }
-        .fill-spot:empty::before { content: "(點擊輸入)"; color: #999; font-weight: normal; font-size: 15px; }
+        /* 點選時變色 */
+        .fill-spot:focus {
+            background-color: #E6F2FF;
+            border-bottom: 2px solid var(--primary);
+            outline: none;
+            color: var(--primary);
+        }
+        .fill-spot:empty::before { 
+            content: "(點擊輸入)"; 
+            color: #999; 
+            font-weight: normal; 
+            font-size: 15px; 
+        }
         .fill-spot.filled { border-bottom: none; min-width: auto; padding: 0 2px; }
 
         /* 標籤 */
@@ -166,37 +168,8 @@
         .ind-tip { background: #FFF8E1; color: #856404; border: 1px solid #FFE69C; }
         .tpl-item { padding: 16px; border-bottom: 1px solid #eee; cursor: pointer; }
 
-        /* 全螢幕填寫面板 */
-        #fillPanel {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #F2F2F7; z-index: 3000; display: none; flex-direction: column;
-            /* 面板也要避開瀏海 */
-            padding-top: env(safe-area-inset-top);
-        }
-        #fillHeader {
-            padding: 15px; background: white; border-bottom: 1px solid #ddd;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        #fillBody { padding: 20px; flex: 1; overflow-y: auto; }
-        #fillContext {
-            font-size: 18px; line-height: 1.6; color: #333; margin-bottom: 20px;
-            background: white; padding: 15px; border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        #fillInputField {
-            width: 100%; padding: 16px; font-size: 22px !important;
-            border: 2px solid var(--primary); border-radius: 12px;
-            background: white; margin-bottom: 20px;
-        }
-        .fill-nav-group { display: flex; gap: 15px; }
-        .fill-nav-btn { 
-            flex: 1; padding: 16px; background: white; border: 1px solid #ddd; 
-            border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .fill-nav-btn:active { background: #f0f0f0; transform: scale(0.98); }
+        /* 全螢幕填寫面板 (已隱藏/停用) */
+        #fillPanel { display: none; }
 
         /* 特殊 Modal */
         #modalFileAction .modal-sheet { height: auto; min-height: 40vh; }
@@ -206,22 +179,7 @@
 </head>
 <body>
 
-<div id="toast" style="position:fixed; top:60px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.9); color:white; padding:12px 24px; border-radius:30px; font-size:16px; font-weight:bold; opacity:0; pointer-events:none; transition:0.3s; z-index:3000; box-shadow:0 4px 15px rgba(0,0,0,0.3);"></div>
-
-<div id="fillPanel">
-    <div id="fillHeader">
-        <div style="font-size:18px; font-weight:bold; color:#333;">✏️ 填寫內容</div>
-        <button onclick="closeFillPanel()" style="border:none; background:none; font-size:20px; color:#007AFF; font-weight:bold;">完成</button>
-    </div>
-    <div id="fillBody">
-        <div id="fillContext"></div>
-        <input type="text" id="fillInputField" class="form-input" placeholder="在此輸入...">
-        <div class="fill-nav-group">
-            <button class="fill-nav-btn" onmousedown="event.preventDefault()" onclick="navigateFillSpot(-1)">⬅️ 上一格</button>
-            <button class="fill-nav-btn" onmousedown="event.preventDefault()" onclick="navigateFillSpot(1)">➡️ 下一格</button>
-        </div>
-    </div>
-</div>
+<div id="toast" style="position:fixed; top:40px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.9); color:white; padding:12px 24px; border-radius:30px; font-size:16px; font-weight:bold; opacity:0; pointer-events:none; transition:0.3s; z-index:3000; box-shadow:0 4px 15px rgba(0,0,0,0.3);"></div>
 
 <div id="app-root">
     <div id="page-setup" class="page-container active">
@@ -607,71 +565,25 @@
         openModal('modalTip');
     }
 
-    // --- Fill-in Panel ---
+    // --- Fill-in Panel (Modified: Direct Input Mode) ---
     function setupEditorClick(idx, event) {
+        // 如果點到的是黃色框框
         if(event.target.classList.contains('fill-spot')) {
-            activeEditorId = idx;
-            activeFillSpot = event.target;
-            openFillPanel();
+            // 幫妳做一個貼心的小動作：點下去時自動選取裡面的字，這樣妳直接打字就會覆蓋，不用刪除
+            const range = document.createRange();
+            range.selectNodeContents(event.target);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
         }
     }
 
-    function openFillPanel() {
-        document.body.classList.add('writing-mode');
-        document.getElementById('fillPanel').style.display = 'flex';
-        updateFillPanelUI();
-        setTimeout(() => {
-            const input = document.getElementById('fillInputField');
-            input.focus(); input.select();
-        }, 150);
-    }
-
-    function closeFillPanel() {
-        if(activeFillSpot) saveCurrentInput();
-        document.getElementById('fillPanel').style.display = 'none';
-        document.body.classList.remove('writing-mode');
-        activeFillSpot = null;
-    }
-
-    function updateFillPanelUI() {
-        const editor = document.getElementById(`editor-${activeEditorId}`);
-        let tempDiv = document.createElement('div');
-        tempDiv.innerHTML = editor.innerHTML;
-        const realSpots = Array.from(editor.querySelectorAll('.fill-spot'));
-        const spotIndex = realSpots.indexOf(activeFillSpot);
-        const previewSpots = tempDiv.querySelectorAll('.fill-spot');
-        if(spotIndex >= 0 && previewSpots[spotIndex]) {
-            previewSpots[spotIndex].outerHTML = `<span style="color:red; font-weight:bold; background:#FFEEEE; padding:2px;">🔴</span>`;
-        }
-        document.getElementById('fillContext').innerHTML = tempDiv.innerHTML;
-        document.getElementById('fillInputField').value = activeFillSpot.innerText;
-    }
-
-    function saveCurrentInput() {
-        const val = document.getElementById('fillInputField').value;
-        activeFillSpot.innerText = val;
-        if(val.trim() !== "") activeFillSpot.classList.add('filled');
-        else activeFillSpot.classList.remove('filled');
-        document.querySelectorAll('.edit-body').forEach((editor, idx) => { DATA.items[idx].desc = editor.innerHTML; });
-    }
-
-    function navigateFillSpot(dir) {
-        saveCurrentInput();
-        const editor = document.getElementById(`editor-${activeEditorId}`);
-        const spots = Array.from(editor.querySelectorAll('.fill-spot'));
-        let currentIdx = spots.indexOf(activeFillSpot);
-        if (currentIdx !== -1) {
-            let nextIdx = currentIdx + dir;
-            if (nextIdx >= 0 && nextIdx < spots.length) {
-                activeFillSpot = spots[nextIdx];
-                updateFillPanelUI();
-                const input = document.getElementById('fillInputField');
-                input.value = activeFillSpot.innerText; input.focus(); input.select();
-            } else {
-                if (dir > 0) { showToast("✅ 填寫完成"); closeFillPanel(); } else { showToast("已是第一格"); }
-            }
-        }
-    }
+    // Legacy functions disabled
+    function openFillPanel() { /* Disabled */ }
+    function closeFillPanel() { /* Disabled */ }
+    function updateFillPanelUI() { /* Disabled */ }
+    function saveCurrentInput() { /* Disabled */ }
+    function navigateFillSpot(dir) { /* Disabled */ }
 
     function insertHtmlTag(idx, text, color) {
         const editor = document.getElementById(`editor-${idx}`);
